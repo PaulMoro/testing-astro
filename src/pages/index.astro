@@ -5,18 +5,50 @@ import Pagination from "@/layouts/components/Pagination.astro";
 import Posts from "@/layouts/Posts.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
 import { sortByDate } from "@/lib/utils/sortFunctions";
+import { getEntryBySlug } from "astro:content";
 
-const posts = await getSinglePage("posts");
+const posts = await getSinglePage("products");
 const sortedPosts = sortByDate(posts);
 const totalPages = Math.ceil(posts.length / config.settings.pagination);
 const currentPosts = sortedPosts.slice(0, config.settings.pagination);
+const entry = await getEntryBySlug("index", "index");
+const { Content } = await entry.render();
+const { redirect_to_on_web } = entry.data;
 ---
 
 <Base>
   <section class="section">
+    <div class="section pt-0">
+      <div class="container">
+        <h3 class="page-heading mb-20">{redirect_to_on_web.title}</h3>
+        <div class="row justify-center gy-4 text-center">
+          {
+            redirect_to_on_web.items.map((item: any) => (
+              <a class="lg:col-4 md:col-6" href={item.link}>
+                <i class="{{.icon}} fa-3x text-primary mb-4" />
+                <h4 class="text-dark font-weight-700 mb-3">{item.title}</h4>
+                <p>{item.description}</p>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
     <div class="container">
-      <Posts posts={currentPosts} className="mb-16" />
-      <Pagination currentPage={1} totalPages={totalPages} />
+      <Posts posts={currentPosts} className="mb-16" test="true" />
+    </div>
+    <div class="container">
+      <div class="content">
+        <p>{redirect_to_on_web.text1}</p>
+      </div>
+    </div>
+    <div class="container">
+      <Posts posts={currentPosts} className="mb-16" test="true" />
+    </div>
+    <div class="container">
+      <div class="content">
+        <p>{redirect_to_on_web.text2}</p>
+      </div>
     </div>
   </section>
 </Base>
